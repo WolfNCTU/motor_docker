@@ -13,6 +13,12 @@ What you need to prepare:
 Tested material:
 1. Arduino UNO
 2. Servo MG996R
+
+Input:
+Angle/Angular velocity
+
+Output:
+None
 */
 
 #include <Servo.h>
@@ -46,8 +52,9 @@ void setup(){
 }
 
 void loop(){
+  // request a value for servo
   Serial.print("Please import a number between 0~180\n");
-  Serial.print("Import 90 to halt the servo\n");
+  Serial.print("Import 90 to halt the servo\n\n");
   while (Serial.available() <= 0);
   if (Serial.available() > 0){
     // read data from serial port
