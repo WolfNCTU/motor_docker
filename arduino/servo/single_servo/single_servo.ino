@@ -38,7 +38,15 @@ int max_band   = 2500;
 int baud_rate  = 9600;
 
 int motor_type = 0;
+int motor_confirm = 0;
+int servo_type = 6;
 int time = 0;
+
+/*
+void confirm(){
+  
+}
+*/
 
 // setup both servo and serial port
 void setup(){
@@ -50,15 +58,86 @@ void setup(){
   Serial.print("\n");
 
   // setup servo
-  // Servo.attach(pin, min_bandwidth = 544, max_bandwidth = 2400)
-  servo1.attach(servo1_pin);
-  // initialize the velocity of the motor
-  servo1.write(state);
-/*
-  Serial.print("Please define your servo type\nIf you use an angle-controllable servo, enter 0\nIf you use a velocity-controllable servo, enter1");
-  motor_type = Serial.read();
-  Serial.println(motor_type);
-*/
+  while (motor_confirm != 1){
+    Serial.print("Please define your servo type\nIf you use an angle-controllable servo, enter 0\nIf you use a velocity-controllable servo, enter 1");
+    motor_type = Serial.read();
+    // confirm your choice
+    if (motor_type == 0){
+      Serial.print("You are using angle-controlleable servo, please confirm (Y/N)");
+      if (Serial.readString() == "Y" || Serial.readString == "y"){
+        motor_confirm = 1;
+      }
+      if (Serial.readString() == "N" || Serial.readString == "n"){
+        motor_confirm = 0;
+      }
+    }
+    if (motor_type == 1){
+      Serial.print("You are using velocity-controlleable servo, please confirm (Y/N)");
+      if (Serial.readString() == "Y" || Serial.readString == "y"){
+        motor_confirm = 1;
+      }
+      if (Serial.readString() == "N" || Serial.readString == "n"){
+        motor_confirm = 0;
+      }
+    }
+  }
+  motor_confirm = 0;
+  // setup bandwidth and motor pin
+  if (motor_type == 0){
+    while (motor_confirm != 1){
+      Serial.print("Choose the type for your servo:\n1 SG90\n2 MG996R\n3 others\n4 using default value 500~2500\n\n");
+      servo_type = Serial.read();
+      if (servo_type == 1){
+        Serial.print("Your servo is SG90, set bandwidth to 500~2400\n");
+        // SG90 setup
+        servo1.attach(servo1_pin, 500, 2400);
+        min_band = 500;
+        max_band = 2400;
+      }
+      if (servo_type == 2){
+        Serial.print("Your servo is MG996R, set bandwidth to 544~2400\n");
+        // MG996R setup
+        servo1.attach(servo1_pin, 544, 2400);
+        min_band = 544;
+        max_band = 2400;
+      }
+      if (servo_type == 3){
+        Serial.print("Your servo is not on the list, please enter your servo bandwidth manually...\n\nMinimum bandwidth: ");
+        min_band = Serial.parseInt();
+        Serial.println(mini_band);
+        Serial.print("\nMaximum bandwidth: ");
+        max_band = Serial.parseInt();
+        Serial.println(max_band);
+        Serial.print("\n");
+      }
+      if (servo_type == 4){
+        Serial.print("Using default value...\n");
+      }
+      // confirm your choice
+      Serial.print("Please confirm...\n");
+      Serial.print("Minimum bandwidth: ");
+      Serial.println(min_band);
+      Serial.print("\nMaximum bandwidth: ");
+      Serial.println(max_band);
+      Serial.print("\n\n");
+      if (Serial.readString() == "Y" || Serial.readString == "y"){
+        motor_confirm = 1;
+      }
+      if (Serial.readString() == "N" || Serial.readString == "n"){
+        motor_confirm = 0;
+      }
+    }
+  }
+  // setup motor pin
+  else if (motor_type == 1){
+    servo1.attach(servo1_pin);
+    // initialize the velocity of the motor
+    servo1.write(state);
+  }
+  // error encounter
+  else {
+    Serial.print("Error encounter, please restart the arduino board...\n\n");
+  }
   Serial.print("Done\n\n");
 }
 
